@@ -279,6 +279,18 @@ namespace IdentityManager.Controllers
             //retrieve name from external login provider
             string name = externalLoginInfo.Principal.FindFirstValue(ClaimTypes.Name);
 
+            ApplicationUser user = new()
+            {
+                UserName = email,
+                Email = email,
+                Name = name
+            };
+
+            await userManager.CreateAsync(user);
+
+            IdentityRole userRole = roleManager.Roles.FirstOrDefault(r => r.Name.ToLower() == "user");
+            await userManager.AddToRoleAsync(user, userRole.Name);
+
             return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email, Name = name });
         }
 
