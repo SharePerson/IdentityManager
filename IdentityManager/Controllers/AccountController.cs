@@ -87,6 +87,7 @@ namespace IdentityManager.Controllers
                 }
             }
 
+            ViewBag.RoleList = roleManager.Roles.ToList().ToSelectListItem("Name");
             return View(registerViewModel);
         }
 
