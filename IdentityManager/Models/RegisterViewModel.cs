@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace IdentityManager.Models
 {
@@ -21,5 +23,8 @@ namespace IdentityManager.Models
         [Display(Name = "Confirm Password")]
         [Compare(nameof(Password), ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { set; get; }
+
+        [Display(Name = "User Role")]
+        public string RoleId { get; set; }
     }
 }

@@ -1,9 +1,13 @@
 ﻿using IdentityManager.Controllers.Base;
 using IdentityManager.Models;
+using IdentityManager.Utilities;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -17,13 +21,15 @@ namespace IdentityManager.Controllers
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly IEmailSender emailSender;
         private readonly UrlEncoder urlEncoder;
+        private readonly RoleManager<IdentityRole> roleManager;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IEmailSender emailSender, UrlEncoder urlEncoder)
+        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IEmailSender emailSender, UrlEncoder urlEncoder, RoleManager<IdentityRole> roleManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.emailSender = emailSender;
             this.urlEncoder = urlEncoder;
+            this.roleManager = roleManager;
         }
 
         public IActionResult Index()
@@ -32,8 +38,16 @@ namespace IdentityManager.Controllers
         }
 
         [HttpGet]
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
+            if(!await roleManager.RoleExistsAsync("Admin"))
+            {
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
+                await roleManager.CreateAsync(new IdentityRole("User"));
+            }
+
+            ViewBag.RoleList = roleManager.Roles.ToList().ToSelectListItem("Name");
+
             RegisterViewModel registerViewModel = new();
             return View(registerViewModel);
         }
@@ -68,6 +82,7 @@ namespace IdentityManager.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> LogOut()
         {
             await signInManager.SignOutAsync();
@@ -291,6 +306,7 @@ namespace IdentityManager.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> EnableAuthenticator(TwoFactorAuthenticationViewModel model)
         {
             if(ModelState.IsValid)
@@ -315,6 +331,7 @@ namespace IdentityManager.Controllers
             return RedirectToAction("TFAConfirmation");
         }
 
+        [Authorize]
         public IActionResult TFAConfirmation()
         {
             return View();
