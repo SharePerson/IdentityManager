@@ -69,8 +69,17 @@ namespace IdentityManager.Controllers
 
                 if(result.Succeeded)
                 {
-                    await signInManager.SignInAsync(user, false);
-                    return RedirectToAction("index", "home");
+                    IdentityRole selectedRole = roleManager.Roles.Where(r => r.Id == registerViewModel.RoleId).FirstOrDefault();
+                    IdentityResult roleResult = await userManager.AddToRoleAsync(user, selectedRole.Name);
+
+                    if(roleResult.Succeeded)
+                    {
+                        await signInManager.SignInAsync(user, false);
+                        return RedirectToAction("index", "home");
+                    }
+
+                    ModelState.AddModelError(string.Empty, $"Failed to assign the {selectedRole.Name} role to the user.");
+                    return View(registerViewModel);
                 }
                 else
                 {
