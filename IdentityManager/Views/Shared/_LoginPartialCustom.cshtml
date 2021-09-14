@@ -1,0 +1,20 @@
+﻿<ul class="navbar-nav">
+    @if (!Context.User.Identity.IsAuthenticated)
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <span class="nav-link">Welcome, @Context.User.Identity.Name</span>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Account" asp-action="Logout">Log Out</a>
+        </li>
+    }
+</ul>

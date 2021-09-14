@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<h1>Home Page</h1>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <ul>
+        @if (Convert.ToBoolean(ViewData["TwoFactorEnabled"].ToString()))
+        {
+            <li>
+                <a asp-action="RemoveAuthenticator" asp-controller="Account">Reset and Remove TFA</a>
+            </li>
+        }
+        else
+        {
+            <li>
+                <a asp-action="EnableAuthenticator" asp-controller="Account">Set up TFA</a>
+            </li>
+        }
+    </ul>
+}
